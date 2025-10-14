@@ -29,6 +29,7 @@ namespace Rebus.AdoNet
 		private const string SAGA_REVISION_COLUMN = "revision";
 		private const string SAGA_CORRELATIONS_COLUMN = "correlations";
 		private static ILog log;
+		private bool YugabyteMode;
 
 		// TODO?: Maybe we should implement our own micro-serialization logic, so we can control actual conversions.
 		//		  I am thinking for example on issues with preccision on decimals, etc. (pruiz)
@@ -377,23 +378,45 @@ namespace Rebus.AdoNet
 					var sagaCorrelationsValuesParam = dialect.EscapeParameter("values");
 					var forUpdate = GetSagaLockingClause(dialect);
 
-					command.CommandText = $@"
-						SELECT s.{dataCol}
-						FROM {sagaTblName} s
-						WHERE s.{sagaTypeCol} = {sagaTypeParam}
-							AND (
-							    s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValueParam, DbType.Object)}
-							    OR
-							    s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValuesParam, DbType.Object)}
-							  )
-						{forUpdate};".Replace("\t", "");
+					if (YugabyteMode)
+					{
+						# XXX: Yugabyte does not support GIN multi-column indexes. This issue has impact in PGSQL's query by default...
+						command.CommandText = $@"
+							WITH temp AS (
+  								SELECT s.{dataCol}
+  								FROM {sagaTblName} s
+  								WHERE s.{sagaTypeCol} = {sagaTypeParam}
+								AND s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValueParam, DbType.Object)}
+								UNION
+  								SELECT s.{dataCol}
+								FROM {sagaTblName} s
+								WHERE s.{sagaTypeCol} = {sagaTypeParam}
+								AND s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValuesParam, DbType.Object)}
+							)
+							SELECT s.{dataCol}
+							FROM {sagaTblName} s, temp c WHERE s.id=c.id
+							{forUpdate};".Replace("\t", "");
+					}
+					else
+					{
+						command.CommandText = $@"
+							SELECT s.{dataCol}
+							FROM {sagaTblName} s
+							WHERE s.{sagaTypeCol} = {sagaTypeParam}
+								AND (
+								    s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValueParam, DbType.Object)}
+								    OR
+								    s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValuesParam, DbType.Object)}
+								  )
+							{forUpdate};".Replace("\t", "");
+					}
 
-					var value = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, fieldFromMessage } });
-					var values = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, new[] { fieldFromMessage } } });
-
-					command.AddParameter(sagaTypeParam, sagaType);
-					command.AddParameter(sagaCorrelationsValueParam, DbType.String, value);
-					command.AddParameter(sagaCorrelationsValuesParam, DbType.String, values);
+						var value = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, fieldFromMessage } });
+						var values = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, new[] { fieldFromMessage } } });
+						
+						command.AddParameter(sagaTypeParam, sagaType);
+						command.AddParameter(sagaCorrelationsValueParam, DbType.String, value);
+						command.AddParameter(sagaCorrelationsValuesParam, DbType.String, values);
 				}
 
 				try
