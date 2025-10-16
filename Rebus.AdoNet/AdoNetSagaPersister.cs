@@ -38,6 +38,7 @@ namespace Rebus.AdoNet
 		protected bool UseSqlArrays { get; private set; }
 		protected bool UseSagaLocking { get; private set; }
 		protected bool UseNoWaitSagaLocking { get; private set; }
+		protected bool IsYugabyteDB { get; private set; }
 
 		protected AdoNetUnitOfWorkManager Manager => manager;
 
@@ -136,6 +137,15 @@ namespace Rebus.AdoNet
 		{
 			(Settings.Binder as CustomSerializationBinder).NameToTypeResolver = nameToTypeResolver;
 			(Settings.Binder as CustomSerializationBinder).TypeToNameResolver = typeToNameResolver;
+			return this;
+		}
+
+		/// <summary>
+		/// Enables YugabyteMode to enhance sagas fetch.
+		/// </summary>
+		public virtual AdoNetSagaPersisterFluentConfigurer EnableYugabyteMode()
+		{
+			IsYugabyteDB = true;
 			return this;
 		}
 
