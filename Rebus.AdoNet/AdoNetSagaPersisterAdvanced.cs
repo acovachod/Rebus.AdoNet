@@ -29,7 +29,6 @@ namespace Rebus.AdoNet
 		private const string SAGA_REVISION_COLUMN = "revision";
 		private const string SAGA_CORRELATIONS_COLUMN = "correlations";
 		private static ILog log;
-		private bool YugabyteMode;
 
 		// TODO?: Maybe we should implement our own micro-serialization logic, so we can control actual conversions.
 		//		  I am thinking for example on issues with preccision on decimals, etc. (pruiz)
@@ -378,9 +377,11 @@ namespace Rebus.AdoNet
 					var sagaCorrelationsValuesParam = dialect.EscapeParameter("values");
 					var forUpdate = GetSagaLockingClause(dialect);
 
-					if (YugabyteMode)
+					if (IsYugabyteDB)
 					{
-						# XXX: Yugabyte does not support GIN multi-column indexes. This issue has impact in PGSQL's query by default...
+						// XXX: YugabyteDB does not yet support multi-column GIN indexes. See: https://github.com/yugabyte/yugabyte-db/issues/10652
+						//		This limitation affects the performance of the default query, so we use a CTE and split the saga queries into two parts.
+						//		This approach significantly improves performance.
 						command.CommandText = $@"
 							WITH temp AS (
   								SELECT s.{dataCol}
