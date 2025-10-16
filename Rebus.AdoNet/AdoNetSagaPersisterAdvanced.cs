@@ -414,7 +414,7 @@ namespace Rebus.AdoNet
 
 					var value = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, fieldFromMessage } });
 					var values = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, new[] { fieldFromMessage } } });
-						
+
 					command.AddParameter(sagaTypeParam, sagaType);
 					command.AddParameter(sagaCorrelationsValueParam, DbType.String, value);
 					command.AddParameter(sagaCorrelationsValuesParam, DbType.String, values);
