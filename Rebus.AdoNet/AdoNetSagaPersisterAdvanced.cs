@@ -412,12 +412,12 @@ namespace Rebus.AdoNet
 							{forUpdate};".Replace("\t", "");
 					}
 
-						var value = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, fieldFromMessage } });
-						var values = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, new[] { fieldFromMessage } } });
+					var value = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, fieldFromMessage } });
+					var values = SerializeCorrelations(new Dictionary<string, object>() { { sagaDataPropertyPath, new[] { fieldFromMessage } } });
 						
-						command.AddParameter(sagaTypeParam, sagaType);
-						command.AddParameter(sagaCorrelationsValueParam, DbType.String, value);
-						command.AddParameter(sagaCorrelationsValuesParam, DbType.String, values);
+					command.AddParameter(sagaTypeParam, sagaType);
+					command.AddParameter(sagaCorrelationsValueParam, DbType.String, value);
+					command.AddParameter(sagaCorrelationsValuesParam, DbType.String, values);
 				}
 
 				try
