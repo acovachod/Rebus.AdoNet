@@ -11,7 +11,7 @@ namespace Rebus.AdoNet.Dialects
 		private static readonly IEnumerable<string> _postgresExceptionNames = new[] { "NpgsqlException", "PostgresException" };
 
 		// TODO: Provide a better (finer grained) version matching logic for Yugabyte.
-		protected override Version MinimumDatabaseVersion => new Version("11.0"); 
+		protected override Version MinimumDatabaseVersion => new Version("11.0");
 		// XXX: https://github.com/yugabyte/yugabyte-db/issues/2742
 		public override bool SupportsSelectForWithSkipLocked => true;
 		// XXX: https://github.com/yugabyte/yugabyte-db/issues/2742
@@ -40,7 +40,20 @@ namespace Rebus.AdoNet.Dialects
 			var versionString = Convert.ToString(result);
 			return versionString.Split('-').First();
 		}
-		
+
+		public override bool SupportsThisDialect(IDbConnection connection)
+		{
+			try {
+				var versionString = (string)connection.ExecuteScalar(@"SELECT VERSION();");
+				var databaseVersion = new Version(this.GetDatabaseVersion(connection));
+				return versionString.StartsWith("PostgreSQL ", StringComparison.Ordinal) && versionString.Contains("YB") && databaseVersion >= MinimumDatabaseVersion;
+			}
+			catch {
+				return false;
+
+			}
+		}
+
 		public override bool IsSelectForNoWaitLockingException(DbException ex)
 		{
 			if (ex != null && _postgresExceptionNames.Contains(ex.GetType().Name))
