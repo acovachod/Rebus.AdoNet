@@ -11,7 +11,7 @@ namespace Rebus.AdoNet.Dialects
 		private static readonly IEnumerable<string> _postgresExceptionNames = new[] { "NpgsqlException", "PostgresException" };
 
 		// TODO: Provide a better (finer grained) version matching logic for Yugabyte.
-		protected override Version MinimumDatabaseVersion => new Version("11.0");
+		protected override Version MinimumDatabaseVersion => new Version("11.0"); 
 		// XXX: https://github.com/yugabyte/yugabyte-db/issues/2742
 		public override bool SupportsSelectForWithSkipLocked => true;
 		// XXX: https://github.com/yugabyte/yugabyte-db/issues/2742
@@ -27,6 +27,7 @@ namespace Rebus.AdoNet.Dialects
 		public override bool SupportsMultiColumnGinIndexes => false;
 		public override bool SupportsJsonColumns => true;
 		public override string JsonColumnGinPathIndexOpclass => "jsonb_path_ops";
+		public override bool SupportsEnhancedCTEFetchQuery => true;
 
 		public YugabyteDbDialect()
 		{

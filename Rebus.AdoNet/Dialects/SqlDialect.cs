@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Text;
+using System.Linq;
 using System.Reflection;
-
+using System.Text;
 using Rebus.AdoNet.Schema;
 
 namespace Rebus.AdoNet.Dialects
@@ -609,6 +609,10 @@ namespace Rebus.AdoNet.Dialects
 			}
 		}
 
+		#endregion
+
+		#region EnhancedCTEFetchQuery
+		public virtual bool SupportsEnhancedCTEFetchQuery => false;
 		#endregion
 	}
 }

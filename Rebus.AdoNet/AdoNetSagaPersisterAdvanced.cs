@@ -377,7 +377,7 @@ namespace Rebus.AdoNet
 					var sagaCorrelationsValuesParam = dialect.EscapeParameter("values");
 					var forUpdate = GetSagaLockingClause(dialect);
 
-					if (IsYugabyteDB)
+					if (dialect.SupportsEnhancedCTEFetchQuery)
 					{
 						// XXX: YugabyteDB does not yet support multi-column GIN indexes. See: https://github.com/yugabyte/yugabyte-db/issues/10652
 						//		This limitation affects the performance of the default query, so we use a CTE and split the saga queries into two parts.
