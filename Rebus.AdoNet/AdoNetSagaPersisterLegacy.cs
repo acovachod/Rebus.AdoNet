@@ -157,14 +157,6 @@ namespace Rebus.AdoNet
 
 			return this;
 		}
-
-		/// <summary>
-		/// Enables YugabyteMode to enhance sagas fetch.
-		/// </summary>
-		public override AdoNetSagaPersisterFluentConfigurer EnableYugabyteMode()
-		{
-			throw new NotSupportedException("YugabyteMode is not supported for legacy persister.");
-		}
 		#endregion
 
 		public override void Insert(ISagaData sagaData, string[] sagaDataPropertyPathsToIndex)

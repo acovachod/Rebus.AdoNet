@@ -65,10 +65,5 @@ namespace Rebus.AdoNet
 		/// <param name="typeToNameResolver">Delegate to invoke when resolving a type-to-name during serialization.</param>
 		/// <returns></returns>
 		AdoNetSagaPersisterFluentConfigurer CustomizeSerializationTypeResolving(Func<TypeDescriptor, Type> nameToTypeResolver, Func<Type, TypeDescriptor> typeToNameResolver);
-
-		/// <summary>
-		/// Enables YugabyteMode to enhance sagas fetch.
-		/// </summary>
-		AdoNetSagaPersisterFluentConfigurer EnableYugabyteMode();
 	}
 }
