@@ -157,6 +157,7 @@ namespace Rebus.AdoNet
 
 			return this;
 		}
+
 		#endregion
 
 		public override void Insert(ISagaData sagaData, string[] sagaDataPropertyPathsToIndex)

@@ -38,6 +38,7 @@ namespace Rebus.AdoNet
 		protected bool UseSqlArrays { get; private set; }
 		protected bool UseSagaLocking { get; private set; }
 		protected bool UseNoWaitSagaLocking { get; private set; }
+
 		protected AdoNetUnitOfWorkManager Manager => manager;
 
 		static AdoNetSagaPersister()
