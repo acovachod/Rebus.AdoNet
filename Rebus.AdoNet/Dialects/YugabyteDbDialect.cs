@@ -27,7 +27,6 @@ namespace Rebus.AdoNet.Dialects
 		public override bool SupportsMultiColumnGinIndexes => false;
 		public override bool SupportsJsonColumns => true;
 		public override string JsonColumnGinPathIndexOpclass => "jsonb_path_ops";
-		public override bool SupportsEnhancedCTEFetchQuery => true;
 
 		public YugabyteDbDialect()
 		{

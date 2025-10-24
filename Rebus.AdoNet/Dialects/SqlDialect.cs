@@ -609,9 +609,5 @@ namespace Rebus.AdoNet.Dialects
 		}
 
 		#endregion
-
-		#region EnhancedCTEFetchQuery
-		public virtual bool SupportsEnhancedCTEFetchQuery => false;
-		#endregion
 	}
 }
