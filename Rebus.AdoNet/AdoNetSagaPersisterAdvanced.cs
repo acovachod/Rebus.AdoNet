@@ -382,20 +382,23 @@ namespace Rebus.AdoNet
 						// XXX: YugabyteDB does not yet support multi-column GIN indexes. See: https://github.com/yugabyte/yugabyte-db/issues/10652
 						//		This limitation affects the performance of the default query, so we use a CTE and split the saga queries into two parts.
 						//		This approach significantly improves performance.
+
+						var idCol = dialect.QuoteForColumnName(SAGA_ID_COLUMN); //< XXX: We need to add id column in YugabyteDbDialect query.
+
 						command.CommandText = $@"
 							WITH temp AS (
-  								SELECT s.{dataCol}
+  								SELECT s.{idCol}
   								FROM {sagaTblName} s
   								WHERE s.{sagaTypeCol} = {sagaTypeParam}
 								AND s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValueParam, DbType.Object)}
 								UNION
-  								SELECT s.{dataCol}
+  								SELECT s.{idCol}
 								FROM {sagaTblName} s
 								WHERE s.{sagaTypeCol} = {sagaTypeParam}
 								AND s.{sagaCorrelationsCol} @> {dialect.Cast(sagaCorrelationsValuesParam, DbType.Object)}
 							)
 							SELECT s.{dataCol}
-							FROM {sagaTblName} s, temp c WHERE s.id=c.id
+							FROM {sagaTblName} s, temp c WHERE s.{idCol}=c.{idCol}
 							{forUpdate};".Replace("\t", "");
 					}
 					else
