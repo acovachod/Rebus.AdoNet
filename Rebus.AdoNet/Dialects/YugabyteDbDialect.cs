@@ -40,19 +40,6 @@ namespace Rebus.AdoNet.Dialects
 			return versionString.Split('-').First();
 		}
 
-		public override bool SupportsThisDialect(IDbConnection connection)
-		{
-			try {
-				var versionString = (string)connection.ExecuteScalar(@"SELECT VERSION();");
-				var databaseVersion = new Version(this.GetDatabaseVersion(connection));
-				return versionString.StartsWith("PostgreSQL ", StringComparison.Ordinal) && versionString.Contains("YB") && databaseVersion >= MinimumDatabaseVersion;
-			}
-			catch {
-				return false;
-
-			}
-		}
-
 		public override bool IsSelectForNoWaitLockingException(DbException ex)
 		{
 			if (ex != null && _postgresExceptionNames.Contains(ex.GetType().Name))
